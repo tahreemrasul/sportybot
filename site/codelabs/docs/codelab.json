@@ -1,0 +1,24 @@
+{
+  "environment": "web",
+  "format": "html",
+  "prefix": "https://storage.googleapis.com",
+  "mainga": "UA-49880327-14",
+  "updated": "2023-12-02T08:11:28+05:00",
+  "id": "docs",
+  "duration": 30,
+  "title": "Build a chatbot application for a retail startup using DialogFlow CX",
+  "authors": "Tahreem Rasul",
+  "summary": "Build a chatbot application for a retail startup using DialogFlow CX",
+  "source": "test_sample.md",
+  "theme": "",
+  "status": [
+    "published"
+  ],
+  "category": [
+    "meta"
+  ],
+  "tags": [
+    "beginner"
+  ],
+  "url": "docs"
+}

@@ -1,0 +1,410 @@
+
+<!doctype html>
+
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <title>Build a chatbot application for a retail startup using DialogFlow CX</title>
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+  <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+  <style>
+    .success {
+      color: #1e8e3e;
+    }
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
+  <google-codelab codelab-gaid=""
+                  codelab-ga4id=""
+                  id="docs"
+                  title="Build a chatbot application for a retail startup using DialogFlow CX"
+                  environment="web"
+                  feedback-link="">
+    
+      <google-codelab-step label="Overview" duration="10">
+        <h2 is-upgraded>Introduction</h2>
+<p>In this codelab, you will be introduced to the process of creating a sophisticated retail chatbot using <a href="https://cloud.google.com/dialogflow?utm_source=codelabs&utm_medium=et&utm_campaign=CDR_lee_aiml_leedialogflowlabs_cx_&utm_content=-&authuser=2&hl=en" target="_blank">Dialogflow CX</a>, a state-of-the-art Conversational AI Platform (CAIP). With Dialogflow CX, you can build and deploy versatile virtual agents such as chatbots, voice bots, and phone gateways. These agents can be integrated across a variety of channels and are capable of understanding and responding in over 50 different languages.</p>
+<p>What&#39;s especially exciting is that this is a no-code tool. Anyone, without any prior coding knowledge can utilize this platform to build applications for their use cases. This is why the tool is so powerful, especially for startups to validate their ideas, get feedback from their end users, and build PoCs.</p>
+<p>In this codelab, you&#39;ll learn to develop &#34;SportyBot,&#34; a website chatbot for &#34;SportStyle Hub,&#34; a fictional retail store specializing in sporting apparel and accessories from Nike, Adidas, and Puma. SportyBot will guide customers through the store&#39;s product range, providing details on the latest collections, exclusive items, personalized recommendations, and assisting with order placement and management.</p>
+<p class="image-container"><img alt="alt text for screen readers" title="Frontend for SportyBot" src="img/1d7799dfcdd4ef39.png"></p>
+<h3 is-upgraded>Here&#39;s what you&#39;ll learn</h3>
+<ul>
+<li>How to create a Dialogflow CX virtual agent within Google Cloud</li>
+<li>Learn about flows</li>
+<li>Learn about entities</li>
+<li>Learn about intents</li>
+<li>Learn about pages and transition pages with state handlers</li>
+<li>Learn how to transition pages with intent routes</li>
+<li>Learn how to transition pages with parameters &amp; condition routes</li>
+<li>Learn how to return conditional responses with system functions</li>
+<li>Learn how to create fallback messages</li>
+<li>Learn how to use the simulator</li>
+<li>Learn how to create test cases &amp; test coverage</li>
+</ul>
+<h2 is-upgraded>Here&#39;s what you need</h2>
+<ul>
+<li>Google Account</li>
+<li>Access to Google Cloud</li>
+</ul>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Environment Setup" duration="10">
+        <h2 is-upgraded>Create a Google Cloud project</h2>
+<p>Since Dialogflow CX runs in Google Cloud, you must create a Google Cloud project. A project organizes all your Google Cloud resources. It consists of a set of collaborators, enabled APIs (and other resources), monitoring tools, billing information, and authentication and access controls.</p>
+<p>When you create a new project, you will need to enter a Project Name. And you will have to link it to an existing Billing Account and Organization.</p>
+<p>A billing account is used to define who pays for a given set of resources, and it can be linked to one or more projects. Project usage is charged to the linked billing account. In most cases, you configure billing when you create a project. For more information, see the Billing documentation. Make sure that billing is enabled for your Cloud project.</p>
+<h2 is-upgraded>Enable the Dialogflow API</h2>
+<p>In order to make use of Dialogflow, you will have to enable the Dialogflow API for your project.</p>
+<ol type="1">
+<li><a href="https://console.cloud.google.com/apis/enableflow?apiid=dialogflow.googleapis.com&utm_source=codelabs&utm_medium=et&utm_campaign=CDR_lee_aiml_leedialogflowlabs_cx_&utm_content=-&authuser=2&project=sportybot" target="_blank">Enable the Dialogflow API</a></li>
+<li>Select the project you want to enable the API for, and click <strong>Continue.</strong></li>
+<li>Collapse the menu of APIs &amp; Services and click on <strong>Create Credentials</strong></li>
+<li><strong>Click Application Data</strong></li>
+<li>Say <code>No, I am not using them as you are not using Kubernetes Engine, App Engine or Cloud Functions</code> for now.</li>
+<li>Click <strong>Done</strong> Setup Credentials</li>
+</ol>
+<h2 is-upgraded>Create a new Dialogflow CX agent</h2>
+<p>To create a new Dialogflow CX agent, first open the Dialogflow CX Console:</p>
+<p><a href="https://dialogflow.cloud.google.com/cx/projects?utm_source=codelabs&utm_medium=et&utm_campaign=CDR_lee_aiml_leedialogflowlabs_cx_&utm_content=-&authuser=2" target="_blank">Dialogflow CX Console</a></p>
+<ol type="1">
+<li>Choose the previously created Google Cloud project.</li>
+<li>Click Create agent.</li>
+<li>Complete the form for basic agent settings:</li>
+</ol>
+<ul>
+<li>You can choose any display name.</li>
+<li>As location choose: us-central1</li>
+<li>Select your preferred time zone.</li>
+<li>Select en - English as default language</li>
+</ul>
+<ol type="1" start="4">
+<li>Click <strong>Create.</strong></li>
+</ol>
+<aside class="special"><p><strong>Note:</strong> In Dialogflow CX you can create multiple agents per project. When you set up an agent in Dialogflow CX, you will have to tie it to a location explicitly.</p>
+</aside>
+<p class="image-container"><img alt="alt text for screen readers" title="Flow Design for SportyBot" src="img/5308975b4b400f52.png"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Flows" duration="10">
+        <p>Human conversations often diverge into various directions, typically encompassing multiple topics. In the case of the chatbot we are building for SportStyle Hub, we would have dialogs about the product catalog, payment, order status, and customer care questions. We could split these conversation topics into flows.</p>
+<p class="image-container"><img alt="alt text for screen readers" title="Flow Design for SportyBot" src="img/eddf352753dedb9c.png"></p>
+<p><a href="https://cloud.google.com/dialogflow/cx/docs/concept/flow?utm_source=codelabs&utm_medium=et&utm_campaign=CDR_lee_aiml_leedialogflowlabs_cx_&utm_content=-&authuser=2" target="_blank">Flows</a> can be thought of as any path the conversation can take. It often makes sense to make these modular, and reusable. The idea is that different teams should be able to work on individual flows.</p>
+<h2 is-upgraded>Simulator</h2>
+<p>Before we begin, let&#39;s test our virtual agent at this stage. On the right side of Dialogflow CX Console you can test the virtual agent, with the built-in simulator.</p>
+<ol type="1">
+<li>Click on the <strong>Test Agent</strong> button, in the top right of your screen.</li>
+<li>In the talk to agent field write: <code>Hello</code> The virtual agent will respond with a default welcome text: ‘Greetings! How can I assist?`</li>
+</ol>
+<p>This can be configured to display a relevant welcome message.</p>
+<p class="image-container"><img title="Default Welcome Intent for SportyBot" style="width: 450.00px" src="img/701c53f25c602434.png"></p>
+<h2 is-upgraded>Default Start Flow</h2>
+<p>Every agent has one flow called the Default Start Flow. This single flow may be all you need for a simple agent. More complicated agents may require additional flows. The Default Start Flow is created automatically when you create an agent. We can configure the Default Start Flow displays a relevant welcome message:</p>
+<ol type="1">
+<li>In the left <em>Build &gt; Flows</em> sidebar, click on <strong>Default Start Flow</strong>, and select the <strong>Start</strong> tree node.</li>
+</ol>
+<p>When you do this, you will notice that this automatically selects the <strong>Start</strong> page, in the <em>Build &gt; Pages</em> sidebar section. We will touch upon Pages in a later section.</p>
+<ol type="1" start="2">
+<li>In <em>Start &gt; Routes</em> click on the <strong>Default Welcome Intent</strong>. An intent categorizes an end user&#39;s intention for a particular prompt. For example, on a first interaction with the bot, the user would expect to be guided on the usage of the chatbot.</li>
+<li>Remove all the <strong>Agent says</strong> entries, and add this new text:</li>
+</ol>
+<p><code>Hi, I am SportyBot, the virtual chatbot for SportStyle Hub, a fictional retail store. You can order products from  different sports brands, ask questions about your order or shipping, or inquire about the the store's product range.  I can also tell you about the brands in our warehouse. How can I help?</code></p>
+<p>To streamline the conversation, we will also need some quick reply buttons / suggestion chips.</p>
+<ol type="1" start="4">
+<li>Click on <strong>Add dialogue option &gt; Custom payload</strong> and use the below code snippet.</li>
+<li>Use the below code snippet as a Custom payload, and hit Save.</li>
+</ol>
+<pre><code language="language-json" class="language-json">{
+    &#34;richContent&#34;: [
+      [
+        {
+          &#34;type&#34;: &#34;chips&#34;,
+          &#34;options&#34;: [
+            {
+              &#34;text&#34;: &#34;Which brands?&#34;
+            },
+            {
+              &#34;text&#34;: &#34;Which products?&#34;
+            },
+            {
+              &#34;text&#34;: &#34;About my order...&#34;
+            }
+          ]
+        }
+      ]
+    ]
+  }
+</code></pre>
+<p class="image-container"><img title="Configuring Default Welcome Intent for SportyBot" style="width: 450.00px" src="img/89c0b7a3d97ee3f0.png"></p>
+<h2 is-upgraded>Creating Flows</h2>
+<ol type="1">
+<li>In Dialogflow CX, click on the + icon &gt; <strong>Create flow</strong>.</li>
+<li>Specify the name: <em>Products</em> and hit enter.</li>
+</ol>
+<p class="image-container"><img title="Creating Flows for SportyBot" style="width: 450.00px" src="img/773aa47ffb24ddf6.png"></p>
+<p>Similarly, go ahead and create flows for the following as well:</p>
+<ul>
+<li><code>Order Process</code></li>
+<li><code>My Order</code></li>
+<li><code>Customer Assistance</code></li>
+</ul>
+<p>Once done, it should look something like this:</p>
+<p class="image-container"><img title="Flows for SportyBot" style="width: 450.00px" src="img/6c6b96afa2aed531.png"></p>
+<h2 is-upgraded>Testing in DialogFlow Messenger</h2>
+<p>Dialogflow Messenger brings a rich Ul for Dialogflow that enables developers to easily add conversational agents to websites. To be able to see rich content such as suggestion chips, this tool can be utilized.</p>
+<ol type="1">
+<li>In the left sidebar, click on <em>Manage &gt; Integrations</em>.</li>
+<li>Choose <strong>Dialogflow Messenger</strong> and click on <strong>Connect</strong>.</li>
+<li>In the popup click <strong>Enable</strong>.</li>
+</ol>
+<p class="image-container"><img title="DialogFlow Messenger Configuration for SportyBot" style="width: 450.00px" src="img/68358b025791dc0b.png"></p>
+<p>Once done, you should be able to view the suggestion chips we have integrated so far. <img title="DialogFlow Messenger for SportyBot" style="width: 450.00px" src="img/1d7799dfcdd4ef39.png"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Entities" duration="0">
+        <p><a href="https://cloud.google.com/dialogflow/cx/docs/concept/entity?utm_source=codelabs&utm_medium=et&utm_campaign=CDR_lee_aiml_leedialogflowlabs_cx_&utm_content=-&authuser=2" target="_blank">Entity types</a> are used to control how data from end-user input is extracted. Entities in databases and technology are foundational elements that represent real-world objects or concepts with distinct characteristics.</p>
+<h2 is-upgraded>Creating Entities</h2>
+<p>Let&#39;s create a <em>Brand</em> entity:</p>
+<ol type="1">
+<li>Click <em>Manage &gt; Entity</em> Types</li>
+<li>Click + <strong>Create</strong></li>
+</ol>
+<ul>
+<li>Display Name: <strong>Brand</strong></li>
+<li>Entities:</li>
+<li>Nike (with synonym: nike)</li>
+<li>Adidas (with synonym: adidas)</li>
+<li>Puma (with synonym: Puma)</li>
+</ul>
+<ol type="1" start="3">
+<li>In <strong>Advanced options</strong>:</li>
+</ol>
+<ul>
+<li>check <strong>Fuzzy Matching</strong>. (If you spell the band name wrong, it might still match it to the right entity.)</li>
+<li>also check <strong>Redact in log</strong>. (If you spell the band name wrong, it will correct the name in the log.)</li>
+</ul>
+<ol type="1" start="3">
+<li>Click <strong>Save</strong></li>
+</ol>
+<p class="image-container"><img title="Entities for SportyBot" style="width: 450.00px" src="img/b761079a00c21c90.png"></p>
+<p>Similarly, we will create an entity of type <em>Product</em>:</p>
+<ol type="1">
+<li>Click <em>Manage &gt; Entity</em> Types</li>
+<li>Click + <strong>Create</strong></li>
+</ol>
+<ul>
+<li>Display Name: <strong>Product</strong></li>
+<li>Entities:</li>
+<li>T-shirt (with synonym: tshirt, sports-wear, sports-shirt)</li>
+<li>Sneakers (with synonym: sneakers, joggers, tennis shoes)</li>
+</ul>
+<ol type="1" start="3">
+<li>Click <strong>Save</strong></li>
+</ol>
+<p>We will also need an entity for clothing and shoes sizes. In a real world scenario, these will be separate, but for simplicity, we will merge this into a single entity:</p>
+<ol type="1">
+<li>Click <em>Manage &gt; Entity</em> Types</li>
+<li>Click + <strong>Create</strong></li>
+</ol>
+<ul>
+<li>Display Name: <strong>Size</strong></li>
+<li>Entities:</li>
+<li>XS (with synonym: Extra Small, 8)</li>
+<li>S (with synonym: Small, 10)</li>
+<li>M (with synonym: Medium, 12)</li>
+<li>L (with synonym: Large, 14)</li>
+<li>XL (with synonym: Extra Large, 16)</li>
+</ul>
+<ol type="1" start="3">
+<li>Click <strong>Save</strong></li>
+</ol>
+<p>Finally, we will have an entity for <em>Order Number</em>. This will be alphanumeric, of the following format (ABCD123)</p>
+<ol type="1">
+<li>Click <em>Manage &gt; Entity</em> Types</li>
+<li>Click + <strong>Create</strong></li>
+</ol>
+<ul>
+<li>Display Name: <strong>OrderNumber</strong></li>
+<li>Regexp entities</li>
+<li>Entity: [A-Z]{4}[0-9]{3}</li>
+</ul>
+<ol type="1" start="3">
+<li>Click <strong>Save</strong></li>
+</ol>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Intents" duration="0">
+        <p>An <a href="https://cloud.google.com/dialogflow/cx/docs/concept/intent?utm_source=codelabs&utm_medium=et&utm_campaign=CDR_lee_aiml_leedialogflowlabs_cx_&utm_content=-&authuser=2" target="_blank">intent</a> categorizes an end-user&#39;s intention for one conversation turn. When an end-user writes or says something, referred to as end-user input, Dialogflow compares the input to intent training phrases to find the best match. This process is called <em>intent matching</em>. Intent matching can only occur for intents associated with an <em>intent route</em> (a state handler with an intent requirement) in scope.</p>
+<h2 is-upgraded>Creating Intents</h2>
+<p>Let&#39;s start by preparing all the intents before we can design the pages in a flow.</p>
+<ol type="1">
+<li>Click the <em>Manage &gt; Intents</em>.</li>
+<li>Click on + <strong>Create</strong></li>
+</ol>
+<p>Use the following details:</p>
+<ul>
+<li>Display name <code>redirect.brands.overview</code></li>
+<li>Description <code>Brands overview: The brands available at the store</code></li>
+</ul>
+<aside class="special"><p><strong>Note</strong>: As a best practice, we will use the following naming convention for pages &amp; intents: all characters are lowercase, use dots (.) instead of spaces. Intents use the following prefixes: <strong>redirect</strong> for intents that use NLU to fetch a page, <strong>confirm/decline</strong> for intents that confirm or decline choices (‘yes&#39; or ‘no&#39; training phrases) and <strong>supp</strong> in case it&#39;s a supplemental question, which can come back at any moment in the flow.</p>
+</aside>
+<p class="image-container"><img title="Intents for SportyBot" style="width: 450.00px" src="img/981a48e9aafb73dd.png"></p>
+<p>Scroll down and create the following <strong>training phrases</strong>:</p>
+<ul>
+<li><code>Which brands are signed?</code></li>
+<li><code>Which brands</code></li>
+<li><code>Which brands are part of the store</code></li>
+<li><code>Who is part of the store</code></li>
+<li><code>From which brands can I buy stuff </code></li>
+<li><code>Sports brands</code></li>
+<li><code>Which brands do you have?</code></li>
+<li><code>Which brands are supported by the label</code></li>
+<li><code>From who can I buy shirts</code></li>
+<li><code>What brands can I order</code></li>
+<li><code>Can I get an overview of all the brands</code></li>
+</ul>
+<ol type="1" start="3">
+<li>Click <strong>Save</strong>.</li>
+</ol>
+<p>You  can go ahead and add intents for the rest of the conversation flows.</p>
+<table>
+<tr><td colspan="1" rowspan="1"><p>Display Name</p>
+</td><td colspan="1" rowspan="1"><p>Training Phrases</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>redirect.product.overview</p>
+</td><td colspan="1" rowspan="1"><p>&#34;Which products do you sell?&#34;, &#34;What items do you have?&#34;, &#34;What are you selling?&#34;, &#34;What are the items?&#34;, &#34;Which products?&#34;, &#34;Please tell me what you have&#34;</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>confirm.brands.overview</p>
+</td><td colspan="1" rowspan="1"><p>&#34;Yeah, let me buy something&#34;, &#34;Yes, I want to purchase something&#34;, &#34;Yes, I would like to order stuff from Nike&#34;, &#34;Ok, let&#39;s buy stuff.&#34;</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>redirect.price</p>
+</td><td colspan="1" rowspan="1"><p>&#34;How much does a t-shirt cost?&#34;, &#34;What&#39;s the price for the sneakers?&#34;, &#34;I want to know the price of a sports shirt&#34;, &#34;What&#39;s the price difference?&#34;, &#34;What does each product cost?&#34;, &#34;What does it cost?&#34;, &#34;What is the price?&#34;</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>redirect.shirt.size</p>
+</td><td colspan="1" rowspan="1"><p>&#34;XS&#34;, &#34;I have M&#34;, &#34;I want Large&#34;, &#34;My size is 3XL&#34;, &#34;Extra Large is the size&#34;</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>redirect.my.order</p>
+</td><td colspan="1" rowspan="1"><p>&#34;About my order&#34;, &#34;I have a question about my order&#34;, &#34;My order is ABCD123, I have a question about my order.&#34;</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>redirect.my.order.canceled</p>
+</td><td colspan="1" rowspan="1"><p>&#34;I want to cancel my order&#34;, &#34;I want to cancel order ABCD123&#34;, &#34;Please cancel order ABCD123&#34;, &#34;Undo my order&#34;, &#34;Stop my order&#34;, &#34;Cancel&#34;</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>confirm.proceed.order</p>
+</td><td colspan="1" rowspan="1"><p>&#34;Yes&#34;, &#34;Yes, please continue&#34;, &#34;Yes order&#34;, &#34;I want to order&#34;, &#34;Yeah&#34;, &#34;Yep&#34;, &#34;I confirm&#34;, &#34;Agree&#34;, &#34;Go ahead&#34;, &#34;Order&#34;, &#34;Buy it&#34;, &#34;Purchase&#34;, &#34;Okay&#34;</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>decline.proceed.order</p>
+</td><td colspan="1" rowspan="1"><p>&#34;No&#34;, &#34;I rather not&#34;, &#34;I don&#39;t want it anymore&#34;, &#34;Don&#39;t order&#34;, &#34;Stop&#34;, &#34;Not anymore&#34;, &#34;Nope&#34;, &#34;Go back&#34;, &#34;Reset&#34;, &#34;Decline&#34;, &#34;I don&#39;t need it&#34;</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>redirect.home</p>
+</td><td colspan="1" rowspan="1"><p>&#34;Go back&#34;, &#34;Home&#34;, &#34;Help&#34;, &#34;What else can I ask&#34;, &#34;Restart&#34;, &#34;Can you tell me what I can order?&#34;, &#34;What questions can I ask&#34;, &#34;I need help&#34;, &#34;Advice please&#34;, &#34;Hi&#34;, &#34;Hello&#34;, &#34;Good day!&#34;</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>redirect.end</p>
+</td><td colspan="1" rowspan="1"><p>&#34;No that&#39;s it, goodbye&#34;, &#34;Bye&#34;, &#34;Cheers&#34;, &#34;End&#34;, &#34;That&#39;s it&#34;, &#34;No more questions&#34;, &#34;Exit&#34;, &#34;Have a good day&#34;, &#34;End Call&#34;, &#34;Close&#34;</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>redirect.shipping.info</p>
+</td><td colspan="1" rowspan="1"><p>&#34;How long will it take?&#34;, &#34;How long is shipping?&#34;, &#34;How long does shipping take?&#34;, &#34;When will I receive it?&#34;</p>
+</td></tr>
+</table>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Page and State Handlers" duration="0">
+        <p>ChatGPT ChatGPT A Dialogflow CX conversation, or session, resembles a finite state machine, akin to a vending machine. In this model, different states such as ‘Waiting for Coins&#39; and ‘Select Candy&#39; represent the stages of interaction. In Dialogflow CX, these states are modeled as &#34;pages.&#34; A conversation progresses through these pages, with only one page active at any given time, including its associated flow.</p>
+<p>Within each Flow, numerous pages collectively manage a full conversation on the designed topic(s). Each flow begins at a special start page, transitioning between pages based on user interactions. Pages comprise fulfillments (like static entry dialogues or webhooks), parameters, and state handlers for conversation control.</p>
+<p>These transitions occur through three route types:</p>
+<p><strong>Intent Routes:</strong> Trigger page changes based on user&#39;s spoken input. <strong>Condition Routes:</strong> Initiate changes based on session parameters. <strong>Event Handlers:</strong> Address fallback events like no input or match.</p>
+<p><em>Fulfillment</em>, defining the conversation&#39;s content or response, can be static or dynamic:</p>
+<p><strong>Static Fulfillment:</strong> Provides a fixed response. <strong>Dynamic Fulfillment:</strong> Calls a webhook for tailored responses. For our retail bot, we&#39;ll design intent routes with static entry fulfillments and use condition routes with parameters to facilitate merchandise orders.</p>
+<h2 is-upgraded>Page Intent Routes</h2>
+<h3 is-upgraded>Creating the pages in the Default Start Flow</h3>
+<ol type="1">
+<li>Click <em>Build &gt; Default Start Flow</em></li>
+<li>Click the <strong>Start</strong> Page</li>
+<li>Click the + icon next to <strong>Routes</strong></li>
+<li>Add <code>redirect.product.overview</code></li>
+<li>Scroll down to <strong>Transition</strong>, and transition to the <code>Product</code> flow.</li>
+<li>Hit <strong>Save</strong></li>
+<li>Repeat the above steps for redirect.brands.overview and the other rows from this table:</li>
+</ol>
+<table>
+<tr><td colspan="1" rowspan="1"><p>Page (In Flow)</p>
+</td><td colspan="1" rowspan="1"><p>Routes &gt; Intent</p>
+</td><td colspan="1" rowspan="1"><p>Routes &gt; Transition To</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Start</p>
+</td><td colspan="1" rowspan="1"><p>Default Welcome Intent</p>
+</td><td colspan="1" rowspan="1"><p>-</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Start</p>
+</td><td colspan="1" rowspan="1"><p>redirect.product.overview</p>
+</td><td colspan="1" rowspan="1"><p>Flow: Product</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Start</p>
+</td><td colspan="1" rowspan="1"><p>redirect.brands.overview</p>
+</td><td colspan="1" rowspan="1"><p>Flow: Product</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Start</p>
+</td><td colspan="1" rowspan="1"><p>redirect.my.order</p>
+</td><td colspan="1" rowspan="1"><p>Flow: My Order</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Start</p>
+</td><td colspan="1" rowspan="1"><p>redirect.my.order.canceled</p>
+</td><td colspan="1" rowspan="1"><p>Flow: My Order</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Start</p>
+</td><td colspan="1" rowspan="1"><p>redirect.my.order.status</p>
+</td><td colspan="1" rowspan="1"><p>Flow: My Order</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Start</p>
+</td><td colspan="1" rowspan="1"><p>redirect.shipping</p>
+</td><td colspan="1" rowspan="1"><p>Flow: Customer Assistance</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Start</p>
+</td><td colspan="1" rowspan="1"><p>redirect.end</p>
+</td><td colspan="1" rowspan="1"><p>Page: End Session</p>
+</td></tr>
+</table>
+<p class="image-container"><img title="Routes for SportyBot" style="width: 450.00px" src="img/7c37094a95c388ca.png"></p>
+<p>Once all the above routes have been added to the start flow, it starts to look like our original drawing:</p>
+<p class="image-container"><img title="Flows with Transitions for SportyBot" style="width: 450.00px" src="img/307a1af4d64d7aae.png"></p>
+<h3 is-upgraded>Creating the pages in the Products Flow</h3>
+<p>Let&#39;s first start with connecting the pages.</p>
+<ol type="1">
+<li>Click <em>Build &gt; Product</em></li>
+<li>Click the <strong>Start</strong> Page</li>
+<li>Click the + icon next to <strong>Routes</strong></li>
+<li>Add <code>redirect.brands.overview</code></li>
+<li>Scroll down to <strong>Transition</strong>, select <strong>Page</strong> and choose: + new <strong>Page</strong></li>
+<li>Use the page name: Brands Overview and hit <strong>Save</strong></li>
+<li>Now let&#39;s finish the rest of the flow:</li>
+</ol>
+<p>Similar to before, the routes can be built within each flow. Towards the end, the workflow should look something like this: <img title="Pages with Transitions for SportyBot" style="width: 450.00px" src="img/bddb82e2fbc5e701.png"></p>
+
+
+      </google-codelab-step>
+    
+  </google-codelab>
+
+  <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/prettify.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
+  <script src="//support.google.com/inapp/api.js"></script>
+
+</body>
+</html>
